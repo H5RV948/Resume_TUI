@@ -1,0 +1,87 @@
+[personal]
+name = "Santiago Reyes Vizcarra"
+email = "santirey3s11@gmail.com"
+phone_number = "6691177275"
+location = "Monterrey"
+github = "https://github.com/H5RV948"
+linkedin = "https://www.linkedin.com/in/santiago-reyes-vizcarra"
+
+[education] 
+institution = "ITESM"
+degree = "Bachelor in Computer Science"
+gpa = "95.61/100"
+expected_graduation = "2029"
+distinctions =  ["Academic Talent Scholarship (50%)", "High-performance group CODEX"]
+
+[skills]
+security =  ["Splunk", "Elastic SIEM", "Sysmon", "Windows Event Logs"]
+systems =  ["Linux", "Windows", "Proxmox", "OpenSSH", "TCP/IP"]
+languages = ["Python", "Rust", "SQL", "Bash", "C++"]
+spoken =  ["English (Fluent)", "Spanish (Native)", "German (Beginner)"]
+
+[[projects]]
+name = "SRVlab Homelab"
+tags = ["Proxmox", "Tailscale", "OpenSSH", "Linux", "OMV"]
+bullets = [
+"• Designed and deployed a headless Proxmox hypervisor managed entirely via remote access.",
+"• Hardened remote access with Tailscale VPN + OpenSSH, eliminating need for physical access to the host.",
+"• Deployed OpenMediaVault NAS via raw disk passthrough for centralized network file storage.",
+"• Engineered multi-layer recovery architecture = web console, SSH, emergency GPU output, and bootable USB fallback."
+]
+date = "2026 - Present"
+
+[[projects]]
+name = "HTB SOC Analyst Path"
+tags = ["Splunk", "Elastic", "Sysmon", "Windows Event Logs", "MITRE ATT&CK"]
+bullets =[
+"• Completing structured SOC analyst training across 15 modules covering log analysis, SIEM, and threat detection.",
+"• Analyzed Windows and Linux logs to triage alerts, distinguish true positives, and make escalation decisions.",
+"• Practiced detection of process injection (T1055) and mapped attacker behavior to MITRE ATT&CK framework.",
+"• Worked through scenarios involving Active Directory, PAW, and Tier-0 asset monitoring in simulated environments.",
+]
+date = "2026 - Present"
+
+[[projects]]
+name = "Multithreaded HTTP Server in Rust"
+tags = ["Rust", "TCP", "Systems Programming"]
+bullets = [
+"• Implemented a TCP-level HTTP/1.1 server from scratch in Rust, handling concurrent requests via a thread pool.",
+"• Applied Rust’s memory safety model to eliminate data races in concurrent connection handling.",
+]
+date = "2026"
+
+[[competitions]]
+name = "CTF Cybersecurity Week – Borregitos.exe"
+team_name = "Borregitos.exe"
+date = "October 2025"
+bullets = [
+"• Achieved 4th national place in a capture-the-flag cybersecurity competition.",
+"• Conducted OSINT reconnaissance and developed a macrovirus to exploit a vulnerability in the target machine.",
+"• Applied nmap for port scanning and network enumeration during offensive security challenges."
+]
+
+[[competitions]]
+name = "HackMTY 2025"
+team_name = "PaySafe"
+date = "October 2025"
+tags = ["React", "Supabase", "SQL", "Gemini API", "ESP32"]
+bullets = [
+"• Built a real-time driver monitoring system integrating ESP32 IoT sensors with a cloud database via Supabase.",
+"• Architected SQL schema for real-time IoT-to-cloud data ingestion and surfaced insights via a Gemini API chatbot."
+]
+
+[[certifications]]
+name = "CompTIA Security+"
+date = "Jan 2026"
+issuer = "CompTIA"
+
+[[certifications]]
+name = "Google Cybersecurity Professional Certificate"
+date = "Jan 2026"
+issuer = "Google"
+
+[[leadership_activities]]
+name = "ICPC competitor"
+tags = "Tecnologico de Monterrey"
+bullets = ["• Competing in ICPC as part of Tec de Monterrey, developing algorithmic problem-solving under pressure."]
+date = "2026 - present"
