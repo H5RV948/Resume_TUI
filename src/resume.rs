@@ -4,10 +4,11 @@ use std::fs;
 #[derive(Deserialize)]
 pub struct Resume { 
     pub personal: Personal,
+    #[serde(default)]
     pub education: Education,
     pub skills: Skills,
     pub projects: Vec<Project>,
-    #[serde(default)]
+    #[serde(default)] // puts a default value if not specified (Optional section)
     pub experience: Vec<Experience>,
     #[serde(default)]
     pub certifications: Vec<Certification>,
@@ -21,13 +22,13 @@ pub struct Resume {
 pub struct Personal {
     pub name: String,
     pub email: String,
-    pub phone_number: Option<String>,
+    pub phone_number: Option<String>, // returns None if not specified (Optional field)
     pub location: Option<String>,
     pub github: String,
     pub linkedin: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default, PartialEq, Eq)]
 pub struct Education {
     pub institution: String,
     pub degree: String,
