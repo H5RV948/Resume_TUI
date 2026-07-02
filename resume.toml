@@ -14,7 +14,7 @@ expected_graduation = "2029"
 distinctions =  ["Academic Talent Scholarship (50%)", "High-performance group CODEX"]
 
 [skills]
-security =  ["Splunk", "Elastic SIEM", "Sysmon", "Windows Event Logs"]
+tools =  ["Splunk", "Elastic SIEM", "Sysmon", "Windows Event Logs"]
 systems =  ["Linux", "Windows", "Proxmox", "OpenSSH", "TCP/IP"]
 languages = ["Python", "Rust", "SQL", "Bash", "C++"]
 spoken =  ["English (Fluent)", "Spanish (Native)", "German (Beginner)"]
@@ -80,8 +80,8 @@ name = "Google Cybersecurity Professional Certificate"
 date = "Jan 2026"
 issuer = "Google"
 
-[[leadership_activities]]
+[[activities]]
 name = "ICPC competitor"
-tags = "Tecnologico de Monterrey"
+tag = "Tecnologico de Monterrey"
 bullets = ["• Competing in ICPC as part of Tec de Monterrey, developing algorithmic problem-solving under pressure."]
 date = "2026 - present"

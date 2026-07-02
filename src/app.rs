@@ -6,11 +6,11 @@ pub enum Section { // for doing a match and avoiding having 2 sections at the sa
     Personal,
     Education,
     Skills,
-    Projects,
     Experience,
+    Projects,
     Certifications,
     Competitions,
-    LeadershipActivities,
+    Activities,
 }
 
 pub struct App {
@@ -33,11 +33,11 @@ impl App {
 
         sections.push(Section::Skills);
 
-        sections.push(Section::Projects);
-
         if !resume.experience.is_empty() {
             sections.push(Section::Experience);
         };
+
+        sections.push(Section::Projects);
 
         if !resume.certifications.is_empty() {
             sections.push(Section::Certifications);
@@ -47,8 +47,8 @@ impl App {
             sections.push(Section::Competitions);
         };
 
-        if !resume.leadership_activities.is_empty() {
-            sections.push(Section::LeadershipActivities);
+        if !resume.activities.is_empty() {
+            sections.push(Section::Activities);
         };
         
         App {   

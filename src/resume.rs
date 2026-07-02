@@ -4,18 +4,25 @@ use std::fs;
 #[derive(Deserialize)]
 pub struct Resume { 
     pub personal: Personal,
+    
     #[serde(default)]
     pub education: Education,
+    
     pub skills: Skills,
-    pub projects: Vec<Project>,
+    
     #[serde(default)] // puts a default value if not specified (Optional section)
     pub experience: Vec<Experience>,
+    
+    pub projects: Vec<Project>,
+    
     #[serde(default)]
     pub certifications: Vec<Certification>,
+    
     #[serde(default)]
     pub competitions: Vec<Competition>,
+    
     #[serde(default)]
-    pub leadership_activities: Vec<Activity>,
+    pub activities: Vec<Activity>,
 }
 
 #[derive(Deserialize)]
@@ -40,10 +47,18 @@ pub struct Education {
 
 #[derive(Deserialize)]
 pub struct Skills {
-    pub security: Vec<String>,
+    pub tools: Vec<String>,
     pub systems: Vec<String>,
     pub languages: Vec<String>,
     pub spoken: Vec<String>,
+}
+
+#[derive(Deserialize)]
+pub struct Experience {
+    pub role: String,
+    pub organization: String,
+    pub period: String,
+    pub bullets: Vec<String>,
 }
 
 #[derive(Deserialize)]
@@ -53,14 +68,6 @@ pub struct Project {
     pub tags: Vec<String>,
     pub bullets: Vec<String>,
     pub date: String,
-}
-
-#[derive(Deserialize)]
-pub struct Experience {
-    pub role: String,
-    pub organization: String,
-    pub period: String,
-    pub bullets: Vec<String>,
 }
 
 #[derive(Deserialize)]
@@ -82,7 +89,7 @@ pub struct Competition {
 #[derive(Deserialize)]
 pub struct Activity {
     pub name: String,
-    pub tags: String,
+    pub tag: String,
     pub bullets: Vec<String>,
     pub date: String,
 }
