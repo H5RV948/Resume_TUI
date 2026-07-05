@@ -1,6 +1,7 @@
 use crossterm::{event::{self, Event, KeyCode, KeyEvent}};
 use std::io::Result;
 
+#[allow(dead_code)]
 pub enum Action {
     Up,
     Down,

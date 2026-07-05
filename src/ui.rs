@@ -1,4 +1,3 @@
-use ratatui::Frame;
 use ratatui::layout::Rect;
 use ratatui::widgets::{Paragraph, Wrap};
 use crate::app::{App, Section};
@@ -167,10 +166,10 @@ pub fn render(app: &App, frame: &mut ratatui::Frame, area: Rect) {
             render_text(frame, text, app.scroll_offset, area);
         }
 
-        _ => {
+        /* _ => {
             let paragraph = Paragraph::new("Not yet implemented")
                 .scroll((0, 0));
             frame.render_widget(paragraph, area);
-        } // you're going to navigate fields that already exist
+        } // you're going to navigate fields that already exist */
     }
 }
