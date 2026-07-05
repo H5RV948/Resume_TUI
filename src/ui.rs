@@ -18,6 +18,8 @@ pub fn render(app: &App, frame: &mut ratatui::Frame, area: Rect) {
                 \nEmail: {}",
                 app.data.personal.name, app.data.personal.email
             );
+
+           
             
             if let Some(phone_number) = &app.data.personal.phone_number {
                 text.push_str(&format!("\nPhone: {}", phone_number));
@@ -29,6 +31,10 @@ pub fn render(app: &App, frame: &mut ratatui::Frame, area: Rect) {
 
             text.push_str(&format!("\nGitHub: {}", app.data.personal.github)); 
             text.push_str(&format!("\nLinkedIn: {}", app.data.personal.linkedin));
+
+            if let Some(profile) = &app.data.personal.profile {
+                text.push_str(&format!("\n\nProfile: {}", profile));
+            }
             
             render_text(frame, text, app.scroll_offset, area);
             

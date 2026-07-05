@@ -29,6 +29,7 @@ pub struct Resume {
 pub struct Personal {
     pub name: String,
     pub email: String,
+    pub profile: Option<String>,
     pub phone_number: Option<String>, // returns None if not specified (Optional field)
     pub location: Option<String>,
     pub github: String,
