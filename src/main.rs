@@ -11,6 +11,7 @@ use anyhow::Result;
 
 use crate::app::App;
 use crate::event::handle_action;
+use crate::ui::centered_rect;
 
 fn main() -> Result<()> {
     let resume = resume::load("resume.toml")?;
@@ -25,10 +26,13 @@ fn main() -> Result<()> {
 
     let _guard = TerminalGuard;
 
+    const DESIRED_WIDTH: u16 = 106;
+    const DESIRED_HEIGHT: u16 = 30;
+    
     loop {
         terminal.draw(|f| {
-            let area = f.area();
-            ui::render(&app, f, area);
+                let area = centered_rect(f.area(), DESIRED_WIDTH, DESIRED_HEIGHT);
+                ui::render(&app, f, area);
         })?;
         
         match handle_action()? {
