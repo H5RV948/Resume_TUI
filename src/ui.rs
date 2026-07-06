@@ -4,7 +4,9 @@ use ratatui::{
     widgets::{Block, Paragraph, Wrap},
     Frame,
 };
-use crate::app::{App, Section};
+
+use crate::{app::{App, Section}, 
+    resume::{Certification, Competition, Project, Activity, Experience}};
 
 pub fn centered_rect(area: Rect, max_width: u16, max_height: u16) -> Rect {
     let width = area.width.min(max_width);
@@ -14,20 +16,27 @@ pub fn centered_rect(area: Rect, max_width: u16, max_height: u16) -> Rect {
     Rect::new(x, y, width, height)
 }
 
+const BODY_STYLE: Style = Style::new().fg(Color::White);
+
 /// Render a single card (bordered block with a title and scrollable text)
 fn render_card(frame: &mut Frame, text: String, title: &str, offset: usize, area: Rect) {
-    let block = Block::bordered()
-        .title(title)
-        .border_style(Style::default().fg(Color::Gray))
-        .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
+    let block = styled_block(title);
 
     let paragraph = Paragraph::new(text)
         .block(block)
-        .style(Style::default().fg(Color::White))
+        .style(BODY_STYLE)
         .scroll((offset as u16, 0))
         .wrap(Wrap { trim: true });
 
     frame.render_widget(paragraph, area);
+}
+
+/// Render the style of the my 'default' block
+fn styled_block(title: impl Into<String> ) -> Block<'static> {
+    Block::bordered()
+        .title(title.into())
+        .border_style(Style::default().fg(Color::Gray))
+        .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD))
 }
 
 /// Render the footer with navigation hints
@@ -37,6 +46,67 @@ fn render_footer(frame: &mut Frame, area: Rect) {
         .style(Style::default().fg(Color::Gray).bg(Color::DarkGray))
         .alignment(Alignment::Center);
     frame.render_widget(paragraph, area);
+}
+
+/// Render the Vec<section> fields
+fn render_paginated<T>(
+    frame: &mut Frame,
+    area: Rect,
+    section: &str,
+    items: &[T],
+    scroll_offset: usize,
+    card_height: usize,
+    empty_msg: &str,
+    scroll_msg: &str,
+    format_item: impl Fn(&T) -> (String, String), // (title, body)
+) {
+    if items.is_empty() {
+        let block = styled_block(section);
+        let placeholder = Paragraph::new(empty_msg)
+                .block(block)
+                .style(BODY_STYLE);
+            frame.render_widget(placeholder, area);
+            return;
+    }
+    let available_height = area.height as usize;
+    let max_visible = available_height / card_height;
+    let total = items.len();
+    
+    let max_scroll = total.saturating_sub(max_visible);
+    let offset = scroll_offset.min(max_scroll);
+    
+    let start = offset;
+    let end = (start + max_visible).min(total);
+
+    let mut constraints = Vec::new();
+    for _ in start..end {
+        constraints.push(Constraint::Length(card_height as u16));
+    }
+    
+    if constraints.is_empty() {
+        let block = styled_block(section);
+        let placeholder = Paragraph::new(scroll_msg)
+            .block(block)
+            .style(BODY_STYLE);
+        frame.render_widget(placeholder, area);
+        return;
+    }
+
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints(constraints)
+        .split(area);
+    
+    for (i, chunk) in chunks.iter().enumerate() {
+        let (title,body) = format_item(&items[start + i]);
+    
+        let block = styled_block(title);
+        let paragraph = Paragraph::new(body)
+            .block(block)
+            .style(BODY_STYLE)
+            .wrap(Wrap { trim: true });
+        frame.render_widget(paragraph, *chunk);
+    }
 }
 
 pub fn render(app: &App, frame: &mut Frame, area: Rect) {
@@ -55,7 +125,6 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
     let section = &app.sections[app.curr_section];
     match section {
         Section::Personal => {
-            // --- Contact text ---
             let mut contact_text = format!("Email: {}\n", app.data.personal.email);
             if let Some(phone) = &app.data.personal.phone_number {
                 contact_text.push_str(&format!("Phone: {}\n", phone));  
@@ -66,10 +135,8 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
             contact_text.push_str(&format!("GitHub: {}\n", app.data.personal.github));
             contact_text.push_str(&format!("LinkedIn: {}", app.data.personal.linkedin));
 
-            // --- Profile text (optional) ---
             let profile_text = app.data.personal.profile.clone();
 
-            // Layout inside Personal: top row (Name), bottom row (split or full)
             let personal_chunks = Layout::default()
                 .direction(Direction::Vertical)
                 .constraints([Constraint::Length(3), Constraint::Min(0)].as_ref())
@@ -77,14 +144,10 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
             let name_area = personal_chunks[0];
             let bottom_area = personal_chunks[1];
 
-            // Name card
-            let name_block = Block::bordered()
-                .title("Name")
-                .border_style(Style::default().fg(Color::Gray))
-                .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
+            let name_block = styled_block("Name");
             let name_paragraph = Paragraph::new(app.data.personal.name.clone())
                 .block(name_block)
-                .style(Style::default().fg(Color::White))
+                .style(BODY_STYLE)
                 .alignment(Alignment::Center);
             frame.render_widget(name_paragraph, name_area);
 
@@ -98,37 +161,28 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
                 let contact_area = bottom_chunks[1];
 
                 // Profile card
-                let profile_block = Block::bordered()
-                    .title("Profile")
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
+                let profile_block = styled_block("Profile");
                 let profile_paragraph = Paragraph::new(profile)
                     .block(profile_block)
-                    .style(Style::default().fg(Color::White))
+                    .style(BODY_STYLE)
                     .scroll((app.scroll_offset as u16, 0))
                     .wrap(Wrap { trim: true });
                 frame.render_widget(profile_paragraph, profile_area);
 
                 // Contact card
-                let contact_block = Block::bordered()
-                    .title("Contact")
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
+                let contact_block = styled_block("Contact");
                 let contact_paragraph = Paragraph::new(contact_text)
                     .block(contact_block)
-                    .style(Style::default().fg(Color::White))
+                    .style(BODY_STYLE)
                     .scroll((app.scroll_offset as u16, 0))
                     .wrap(Wrap { trim: true });
                 frame.render_widget(contact_paragraph, contact_area);
             } else {
                 // No profile – contact takes full width
-                let contact_block = Block::bordered()
-                    .title("Contact")
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
+                let contact_block = styled_block("Contact");
                 let contact_paragraph = Paragraph::new(contact_text)
                     .block(contact_block)
-                    .style(Style::default().fg(Color::White))
+                    .style(BODY_STYLE)
                     .scroll((app.scroll_offset as u16, 0))
                     .wrap(Wrap { trim: true });
                 frame.render_widget(contact_paragraph, bottom_area);
@@ -136,11 +190,9 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
         }
 
         Section::Education => {
-            // --- Build parts ---
             let institution = format!("Institution: {}", app.data.education.institution);
             let degree = format!("Degree: {}", app.data.education.degree);
         
-            // Details: GPA and Expected Graduation (each on its own line)
             let mut details = String::new();
             if let Some(gpa) = &app.data.education.gpa {
                 details.push_str(&format!("GPA: {}\n", gpa));
@@ -163,20 +215,17 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
                 }
             }
         
-            // --- Layout: 3 rows ---
+            // Layout: 3 rows 
             let chunks = Layout::default()
                 .direction(Direction::Vertical)
                 .constraints([Constraint::Length(3), Constraint::Length(4), Constraint::Min(0)].as_ref())
                 .split(content_area);
         
             // Top: Institution
-            let institution_block = Block::bordered()
-                .title("Institution")
-                .border_style(Style::default().fg(Color::Gray))
-                .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
+            let institution_block = styled_block("Institution");
             let institution_paragraph = Paragraph::new(institution)
                 .block(institution_block)
-                .style(Style::default().fg(Color::White));
+                .style(BODY_STYLE);
             frame.render_widget(institution_paragraph, chunks[0]);
         
             // Middle: Degree (left) + Details (right)
@@ -186,52 +235,42 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
                 .split(chunks[1]);
         
             // Degree
-            let degree_block = Block::bordered()
-                .title("Degree")
-                .border_style(Style::default().fg(Color::Gray))
-                .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
+            let degree_block = styled_block("Degree");
             let degree_paragraph = Paragraph::new(degree)
                 .block(degree_block)
-                .style(Style::default().fg(Color::White));
+                .style(BODY_STYLE);
             frame.render_widget(degree_paragraph, middle_chunks[0]);
         
             // Details
-            let details_block = Block::bordered()
-                .title("Details")
-                .border_style(Style::default().fg(Color::Gray))
-                .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
+            let details_block = styled_block("Details");
             let details_paragraph = Paragraph::new(details)
                 .block(details_block)
-                .style(Style::default().fg(Color::White));
+                .style(BODY_STYLE);
             frame.render_widget(details_paragraph, middle_chunks[1]);
         
             // Bottom: Distinctions (scrollable)
-            let distinctions_block = Block::bordered()
-                .title("Distinctions")
-                .border_style(Style::default().fg(Color::Gray))
-                .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
+            let distinctions_block = styled_block("Distinctions");
             let distinctions_paragraph = Paragraph::new(distinctions)
                 .block(distinctions_block)
-                .style(Style::default().fg(Color::White))
+                .style(BODY_STYLE)
                 .scroll((app.scroll_offset as u16, 0))
                 .wrap(Wrap { trim: true });
             frame.render_widget(distinctions_paragraph, chunks[2]);
         }
 
         Section::Skills => {
-            // --- Build the four text strings ---
             let tools = app.data.skills.tools.join(", ");
             let systems = app.data.skills.systems.join(", ");
             let languages = app.data.skills.languages.join(", ");
             let spoken = app.data.skills.spoken.join(", ");
         
-            // --- Split content_area into 2 rows ---
+            // Split content_area into 2 rows
             let rows = Layout::default()
                 .direction(Direction::Vertical)
                 .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
                 .split(content_area);
         
-            // --- Split each row into 2 columns ---
+            // Split each row into 2 columns 
             let top_cols = Layout::default()
                 .direction(Direction::Horizontal)
                 .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
@@ -242,324 +281,96 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
                 .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
                 .split(rows[1]);
         
-            // --- Helper to render a single square ---
-            let render_square = |frame: &mut Frame, text: String, title: &str, area: Rect| {
-                let block = Block::bordered()
-                    .title(title)
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
-                let paragraph = Paragraph::new(text)
-                    .block(block)
-                    .style(Style::default().fg(Color::White))
-                    .wrap(Wrap { trim: true });
-                frame.render_widget(paragraph, area);
-            };
         
-            // --- Render each square ---
-            render_square(frame, tools, "Tools", top_cols[0]);
-            render_square(frame, systems, "Systems", top_cols[1]);
-            render_square(frame, languages, "Languages", bottom_cols[0]);
-            render_square(frame, spoken, "Spoken", bottom_cols[1]);
+            // Render each square 
+            render_card(frame, tools, "Tools", 0, top_cols[0]);
+            render_card(frame, systems, "Systems", 0, top_cols[1]);
+            render_card(frame, languages, "Languages", 0, bottom_cols[0]);
+            render_card(frame, spoken, "Spoken", 0, bottom_cols[1]);
         }
 
         Section::Experience => {
-            let mut text = String::new();
-            for exp in &app.data.experience {
-                text.push_str(&format!(
+            let format_item = |item: &Experience| -> (String, String) {
+                let mut body = String::new();
+                
+                body.push_str(&format!(
                     "Role: {}\nOrganization: {}\nPeriod: {}\n",
-                    exp.role, exp.organization, exp.period
+                    item.role, item.organization, item.period
                 ));
-                for b in &exp.bullets {
-                    text.push_str(&format!("- {}\n", b));
+                for b in &item.bullets {
+                    body.push_str(&format!("- {}\n", b));
                 }
-                text.push_str("\n");
-            }
-            render_card(frame, text, "Experience", app.scroll_offset, content_area);
+                body.push_str("\n");
+                
+                (item.role.clone(), body)
+            };
+            render_paginated::<Experience>(frame, area, "Experience", &app.data.experience, app.scroll_offset, 10, "No experience section listed", "Scroll to see more of the experience section", format_item);
         }
         
         Section::Projects => {
-            let projects = &app.data.projects;
-            if projects.is_empty() {
-                // If no projects, show a placeholder
-                let block = Block::bordered()
-                    .title("Projects")
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
-                let placeholder = Paragraph::new("No projects listed")
-                    .block(block)
-                    .style(Style::default().fg(Color::White));
-                frame.render_widget(placeholder, content_area);
-                return;
-            }
-        
-            // Determine how many projects fit vertically
-            // Each card will have a fixed height of 5 lines (including border).
-            // If your terminal is small, you may adjust this.
-            const CARD_HEIGHT: usize = 10;
-            let available_height = content_area.height as usize;
-            let max_visible = available_height / CARD_HEIGHT;
-            let total = projects.len();
-        
-            // Clamp scroll_offset so we don't scroll past the last visible project
-            let max_scroll = total.saturating_sub(max_visible);
-            let offset = app.scroll_offset.min(max_scroll);
-        
-            // Visible range
-            let start = offset;
-            let end = (start + max_visible).min(total);
-        
-            // Build a layout with one row per visible project
-            let mut constraints = Vec::new();
-            for _ in start..end {
-                constraints.push(Constraint::Length(CARD_HEIGHT as u16));
-            }
-            // Fill remaining space with a flexible constraint (optional)
-            if constraints.is_empty() {
-                // No projects visible – show a placeholder
-                let block = Block::bordered()
-                    .title("Projects")
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
-                let placeholder = Paragraph::new("Scroll to see more projects")
-                    .block(block)
-                    .style(Style::default().fg(Color::White));
-                frame.render_widget(placeholder, content_area);
-                return;
-            }
-        
-            let chunks = Layout::default()
-                .direction(Direction::Vertical)
-                .constraints(constraints)
-                .split(content_area);
-        
-            // Render each visible project
-            for (i, chunk) in chunks.iter().enumerate() {
-                let proj = &projects[start + i];
-                let mut text = String::new();
-                // Title line: name, tags, date
-                text.push_str(&format!(
+            let format_item = |item: &Project| -> (String, String) {
+                let mut body = String::new();
+                body.push_str(&format!(
                     "{} | {} | {}\n",
-                    proj.name,
-                    proj.tags.join(", "),
-                    proj.date
+                    item.name,
+                    item.tags.join(", "),
+                    item.date
                 ));
-                // Description
-                if let Some(desc) = &proj.description {
-                    text.push_str(&format!("  {}\n", desc));
+
+                if let Some(desc) = &item.description {
+                    body.push_str(&format!("  {}\n", desc));
                 }
-                // Bullets
-                for b in &proj.bullets {
-                    text.push_str(&format!("- {}\n", b));
+
+                for b in &item.bullets {
+                    body.push_str(&format!("- {}\n", b));
                 }
-        
-                let block = Block::bordered()
-                    .title(proj.name.clone())
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
-                let paragraph = Paragraph::new(text)
-                    .block(block)
-                    .style(Style::default().fg(Color::White))
-                    .wrap(Wrap { trim: true });
-                frame.render_widget(paragraph, *chunk);
-            }
+                
+                (item.name.clone(), body)
+            };
+            render_paginated::<Project>(frame, area, "Projects", &app.data.projects, app.scroll_offset, 10, "No projects listed", "Scroll to see more projects", format_item);
         }
 
         Section::Certifications => {
-            let certs = &app.data.certifications;
-            if certs.is_empty() {
-                let block = Block::bordered()
-                    .title("Certifications")
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
-                let placeholder = Paragraph::new("No certifications listed")
-                    .block(block)
-                    .style(Style::default().fg(Color::White));
-                frame.render_widget(placeholder, content_area);
-                return;
-            }
-        
-            const CARD_HEIGHT: usize = 4; // enough for Name, Issuer, Date, and a blank line
-            let available_height = content_area.height as usize;
-            let max_visible = available_height / CARD_HEIGHT;
-            let total = certs.len();
-        
-            let max_scroll = total.saturating_sub(max_visible);
-            let offset = app.scroll_offset.min(max_scroll);
-            let start = offset;
-            let end = (start + max_visible).min(total);
-        
-            // Build constraints for visible cards
-            let mut constraints = Vec::new();
-            for _ in start..end {
-                constraints.push(Constraint::Length(CARD_HEIGHT as u16));
-            }
-            if constraints.is_empty() {
-                let block = Block::bordered()
-                    .title("Certifications")
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
-                let placeholder = Paragraph::new("Scroll to see more certifications")
-                    .block(block)
-                    .style(Style::default().fg(Color::White));
-                frame.render_widget(placeholder, content_area);
-                return;
-            }
-        
-            let chunks = Layout::default()
-                .direction(Direction::Vertical)
-                .constraints(constraints)
-                .split(content_area);
-        
-            for (i, chunk) in chunks.iter().enumerate() {
-                let cert = &certs[start + i];
-                let text = format!(
+            let format_item = |item: &Certification| -> (String, String) {
+                let body = format!(
                     "Name: {}\nIssuer: {}\nDate: {}",
-                    cert.name, cert.issuer, cert.date
+                    item.name, item.issuer, item.date
                 );
-                let block = Block::bordered()
-                    .title(cert.name.clone())
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
-                let paragraph = Paragraph::new(text)
-                    .block(block)
-                    .style(Style::default().fg(Color::White))
-                    .wrap(Wrap { trim: true });
-                frame.render_widget(paragraph, *chunk);
-            }
+                
+                (item.name.clone(), body)
+            };
+            render_paginated::<Certification>(frame, area, "Certifications", &app.data.certifications, app.scroll_offset, 4, "No certifications listed", "Scroll to see more certifications", format_item);
         }
 
         Section::Competitions => {
-            let comps = &app.data.competitions;
-            if comps.is_empty() {
-                let block = Block::bordered()
-                    .title("Competitions")
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
-                let placeholder = Paragraph::new("No competitions listed")
-                    .block(block)
-                    .style(Style::default().fg(Color::White));
-                frame.render_widget(placeholder, content_area);
-                return;
-            }
-        
-            const CARD_HEIGHT: usize = 8; // Adjust based on typical content (title, team, date, bullets)
-            let available_height = content_area.height as usize;
-            let max_visible = available_height / CARD_HEIGHT;
-            let total = comps.len();
-        
-            let max_scroll = total.saturating_sub(max_visible);
-            let offset = app.scroll_offset.min(max_scroll);
-            let start = offset;
-            let end = (start + max_visible).min(total);
-        
-            let mut constraints = Vec::new();
-            for _ in start..end {
-                constraints.push(Constraint::Length(CARD_HEIGHT as u16));
-            }
-            if constraints.is_empty() {
-                let block = Block::bordered()
-                    .title("Competitions")
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
-                let placeholder = Paragraph::new("Scroll to see more competitions")
-                    .block(block)
-                    .style(Style::default().fg(Color::White));
-                frame.render_widget(placeholder, content_area);
-                return;
-            }
-        
-            let chunks = Layout::default()
-                .direction(Direction::Vertical)
-                .constraints(constraints)
-                .split(content_area);
-        
-            for (i, chunk) in chunks.iter().enumerate() {
-                let comp = &comps[start + i];
-                let mut text = String::new();
-                text.push_str(&format!("{} | {}", comp.name, comp.team_name));
-                if let Some(tags) = &comp.tags {
-                    text.push_str(&format!(" | {}", tags.join(",")));
+            let format_item = |item: &Competition| -> (String, String) {
+                let mut body = String::new();
+                body.push_str(&format!("{} | {}", item.name, item.team_name));
+                if let Some(tags) = &item.tags {
+                    body.push_str(&format!(" | {}", tags.join(",")));
                 }
-                text.push_str(&format!("\nDate: {}\n", comp.date));
-                for b in &comp.bullets {
-                    text.push_str(&format!("- {}\n", b));
+                body.push_str(&format!("\nDate: {}\n", item.date));
+                for b in &item.bullets {
+                    body.push_str(&format!("- {}\n", b));
                 }
-        
-                let block = Block::bordered()
-                    .title(comp.name.clone())
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
-                let paragraph = Paragraph::new(text)
-                    .block(block)
-                    .style(Style::default().fg(Color::White))
-                    .wrap(Wrap { trim: true });
-                frame.render_widget(paragraph, *chunk);
-            }
+                
+                (item.name.clone(), body)
+            };
+            render_paginated::<Competition>(frame, area, "Competitions", &app.data.competitions, app.scroll_offset, 8, "No competitions listed", "Scroll to see more competitions", format_item);
         }
 
         Section::Activities => {
-            let acts = &app.data.activities;
-            if acts.is_empty() {
-                let block = Block::bordered()
-                    .title("Activities")
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
-                let placeholder = Paragraph::new("No activities listed")
-                    .block(block)
-                    .style(Style::default().fg(Color::White));
-                frame.render_widget(placeholder, content_area);
-                return;
-            }
-        
-            const CARD_HEIGHT: usize = 5; // Adjust based on typical content (name, tag, date, bullets)
-            let available_height = content_area.height as usize;
-            let max_visible = available_height / CARD_HEIGHT;
-            let total = acts.len();
-        
-            let max_scroll = total.saturating_sub(max_visible);
-            let offset = app.scroll_offset.min(max_scroll);
-            let start = offset;
-            let end = (start + max_visible).min(total);
-        
-            let mut constraints = Vec::new();
-            for _ in start..end {
-                constraints.push(Constraint::Length(CARD_HEIGHT as u16));
-            }
-            if constraints.is_empty() {
-                let block = Block::bordered()
-                    .title("Activities")
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
-                let placeholder = Paragraph::new("Scroll to see more activities")
-                    .block(block)
-                    .style(Style::default().fg(Color::White));
-                frame.render_widget(placeholder, content_area);
-                return;
-            }
-        
-            let chunks = Layout::default()
-                .direction(Direction::Vertical)
-                .constraints(constraints)
-                .split(content_area);
-        
-            for (i, chunk) in chunks.iter().enumerate() {
-                let act = &acts[start + i];
-                let mut text = String::new();
-                text.push_str(&format!("{} | {} | {}\n", act.name, act.tag, act.date));
-                for b in &act.bullets {
-                    text.push_str(&format!("- {}\n", b));
+            let format_item = |item: &Activity| -> (String, String) {
+                let mut body = String::new();
+                body.push_str(&format!("{} | {} | {}\n", item.name, item.tag, item.date));
+                for b in &item.bullets {
+                    body.push_str(&format!("- {}\n", b));
                 }
-        
-                let block = Block::bordered()
-                    .title(act.name.clone())
-                    .border_style(Style::default().fg(Color::Gray))
-                    .title_style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD));
-                let paragraph = Paragraph::new(text)
-                    .block(block)
-                    .style(Style::default().fg(Color::White))
-                    .wrap(Wrap { trim: true });
-                frame.render_widget(paragraph, *chunk);
-            }
+                
+                (item.name.clone(), body)
+            };
+
+            render_paginated::<Activity>(frame, area, "Activities", &app.data.activities, app.scroll_offset, 5, "No activities listed", "Scroll to see more activities", format_item);
         }
     }
 }

@@ -9,9 +9,9 @@ use crossterm::ExecutableCommand;
 use ratatui::{Terminal, backend::CrosstermBackend};
 use anyhow::Result;
 
-use crate::app::App;
-use crate::event::handle_action;
-use crate::ui::centered_rect;
+use crate::{app::App, 
+    event::handle_action, 
+    ui::centered_rect};
 
 fn main() -> Result<()> {
     let resume = resume::load("resume.toml")?;
@@ -27,7 +27,7 @@ fn main() -> Result<()> {
     let _guard = TerminalGuard;
 
     const DESIRED_WIDTH: u16 = 106;
-    const DESIRED_HEIGHT: u16 = 30;
+    const DESIRED_HEIGHT: u16 = 35;
     
     loop {
         terminal.draw(|f| {

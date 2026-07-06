@@ -1,5 +1,5 @@
-use crate::resume::*;
-use crate::event::Action;
+use crate::{resume::*, 
+    event::Action};
 
 #[derive(PartialEq, Eq)] // allows to compare with the enum types
 pub enum Section { // for doing a match and avoiding having 2 sections at the same time
