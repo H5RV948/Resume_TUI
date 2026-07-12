@@ -21,6 +21,7 @@ fn main() -> Result<()> {
 
     let backend = CrosstermBackend::new(stdout());
     let mut terminal = Terminal::new(backend)?;
+    terminal.clear()?;
 
     let mut app = App::new(resume);
 
