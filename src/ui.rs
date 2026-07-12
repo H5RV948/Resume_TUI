@@ -16,7 +16,7 @@ pub fn centered_rect(area: Rect, max_width: u16, max_height: u16) -> Rect {
     Rect::new(x, y, width, height)
 }
 
-const BODY_STYLE: Style = Style::new().fg(Color::White);
+const BODY_STYLE: Style = Style::new().fg(Color::White).bg(Color::Black);
 
 /// Render a single card (bordered block with a title and scrollable text)
 fn render_card(frame: &mut Frame, text: String, title: &str, offset: usize, area: Rect) {
