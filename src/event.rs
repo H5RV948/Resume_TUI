@@ -12,7 +12,9 @@ pub enum Action {
 }
 
 pub fn handle_action() -> Result<Option<Action>> {
-    let action = match event::read()? {
+    let ev = event::read()?;
+    
+    let action = match ev {
         Event::Key(KeyEvent {code, ..}) => match code {
             KeyCode::Char('w') | KeyCode::Char('k') | KeyCode::Up => Some(Action::Up),
             KeyCode::Char('s') | KeyCode::Char('j') | KeyCode::Down => Some(Action::Down),
