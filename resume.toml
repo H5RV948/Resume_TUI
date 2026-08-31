@@ -23,7 +23,7 @@ spoken =  ["English (Fluent)", "Spanish (Native)", "German (Beginner)"]
 
 [[projects]]
 name = "SRVlab Homelab"
-tags = ["Proxmox", "Tailscale", "OpenSSH", "Linux", "OMV"]
+tags = ["Proxmox", "Tailscale", "OpenSSH", "Linux", "Traefik"]
 bullets = [
 "Administered a self-hosted virtualization environment (Proxmox) supporting multiple services, managing uptime and remote access entirely via CLI/SSH",
 "Configured and maintained secure remote access (Tailscale VPN, OpenSSH) for distributed infrastructure, resolving connectivity and access issues independently",
