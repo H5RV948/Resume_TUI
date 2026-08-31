@@ -259,34 +259,65 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
         }
 
         Section::Skills => {
+            let networking = app.data.skills.networking
+                .as_ref()
+                .map(|v| v.join(", "))
+                .unwrap_or_default();
+            let security = app.data.skills.security
+                .as_ref()
+                .map(|v| v.join(", "))
+                .unwrap_or_default();
             let tools = app.data.skills.tools.join(", ");
             let systems = app.data.skills.systems.join(", ");
             let languages = app.data.skills.languages.join(", ");
             let spoken = app.data.skills.spoken.join(", ");
         
-            // Split content_area into 2 rows
+            let has_extra = app.data.skills.networking.is_some() || app.data.skills.security.is_some();
+        
             let rows = Layout::default()
                 .direction(Direction::Vertical)
                 .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
                 .split(content_area);
         
-            // Split each row into 2 columns 
-            let top_cols = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
-                .split(rows[0]);
+            if has_extra {
+                // 2x3 grid: 6 panels
+                let col_constraints = [
+                    Constraint::Percentage(34),
+                    Constraint::Percentage(33),
+                    Constraint::Percentage(33),
+                ];
+                let top_cols = Layout::default()
+                    .direction(Direction::Horizontal)
+                    .constraints(col_constraints.as_ref())
+                    .split(rows[0]);
+                let bottom_cols = Layout::default()
+                    .direction(Direction::Horizontal)
+                    .constraints(col_constraints.as_ref())
+                    .split(rows[1]);
         
-            let bottom_cols = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
-                .split(rows[1]);
+                render_card(frame, networking, "Networking", 0, top_cols[0]);
+                render_card(frame, security, "Security", 0, top_cols[1]);
+                render_card(frame, tools, "Tools", 0, top_cols[2]);
+                render_card(frame, systems, "Systems", 0, bottom_cols[0]);
+                render_card(frame, languages, "Languages", 0, bottom_cols[1]);
+                render_card(frame, spoken, "Spoken", 0, bottom_cols[2]);
+            } else {
+                // 2x2 grid: 4 panels (original layout)
+                let col_constraints = [Constraint::Percentage(50), Constraint::Percentage(50)];
+                let top_cols = Layout::default()
+                    .direction(Direction::Horizontal)
+                    .constraints(col_constraints.as_ref())
+                    .split(rows[0]);
+                let bottom_cols = Layout::default()
+                    .direction(Direction::Horizontal)
+                    .constraints(col_constraints.as_ref())
+                    .split(rows[1]);
         
-        
-            // Render each square 
-            render_card(frame, tools, "Tools", 0, top_cols[0]);
-            render_card(frame, systems, "Systems", 0, top_cols[1]);
-            render_card(frame, languages, "Languages", 0, bottom_cols[0]);
-            render_card(frame, spoken, "Spoken", 0, bottom_cols[1]);
+                render_card(frame, tools, "Tools", 0, top_cols[0]);
+                render_card(frame, systems, "Systems", 0, top_cols[1]);
+                render_card(frame, languages, "Languages", 0, bottom_cols[0]);
+                render_card(frame, spoken, "Spoken", 0, bottom_cols[1]);
+            }
         }
 
         Section::Experience => {

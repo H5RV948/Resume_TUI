@@ -1,53 +1,52 @@
 [personal]
 name = "Santiago Reyes Vizcarra"
 email = "santirey3s11@gmail.com"
-profile = "Computer Science student at Tecnológico de Monterrey with hands-on experience in IT infrastructure, endpoint security, and systems administration. Holds CompTIA Security+ and Google Cybersecurity certifications, and is actively training in blue team operations through the HTB SOC Analyst path. Operates a personal homelab running Proxmox, OpenSSH, and a self-hosted NAS, reinforcing real-world skills in networking, remote access, and system hardening."
-phone_number = "6691177275"
+profile = "Computer Science student at Tecnológico de Monterrey backed by CompTIA Security+ and Google Cybersecurity certifications, I focus on building and maintaining resilient systems. My practical experience spans IT infrastructure, endpoint security, and systems administration, where I diagnose and resolve complex technical challenges to keep operations running securely. Passionate about security and modern infrastructure, I bring a strong blend of technical problem-solving and operational focus to safeguard digital environments."
 location = "Monterrey"
 github = "https://github.com/H5RV948"
 linkedin = "https://www.linkedin.com/in/santiago-reyes-vizcarra"
 
 [education] 
-institution = "ITESM"
+institution = "Tecnologico de Monterrey"
 degree = "Bachelor in Computer Science"
 gpa = "95.61/100"
 expected_graduation = "2029"
 distinctions =  ["Academic Talent Scholarship (50%)", "High-performance group CODEX"]
 
 [skills]
-tools =  ["Splunk", "Elastic SIEM", "Sysmon", "Windows Event Logs"]
-systems =  ["Linux", "Windows", "Proxmox", "OpenSSH", "TCP/IP"]
-languages = ["Python", "Rust", "SQL", "Bash", "C++"]
+networking = ["TCP/IP", "VPNs"]
+security = ["AAA", "CIA Triad", "VPNs", "Footprinting"]
+tools =  ["Splunk", "Metasploit", "Nmap", "Mimikatz", "cURL", "Cisco Packet Tracer"]
+systems =  ["Linux", "Windows", "Proxmox"]
+languages = ["Python", "C++","Go", "Rust", "SQL", "Bash"]
 spoken =  ["English (Fluent)", "Spanish (Native)", "German (Beginner)"]
 
 [[projects]]
 name = "SRVlab Homelab"
 tags = ["Proxmox", "Tailscale", "OpenSSH", "Linux", "OMV"]
 bullets = [
-"• Designed and deployed a headless Proxmox hypervisor managed entirely via remote access.",
-"• Hardened remote access with Tailscale VPN + OpenSSH, eliminating need for physical access to the host.",
-"• Deployed OpenMediaVault NAS via raw disk passthrough for centralized network file storage.",
-"• Engineered multi-layer recovery architecture = web console, SSH, emergency GPU output, and bootable USB fallback."
+"Administered a self-hosted virtualization environment (Proxmox) supporting multiple services, managing uptime and remote access entirely via CLI/SSH",
+"Configured and maintained secure remote access (Tailscale VPN, OpenSSH) for distributed infrastructure, resolving connectivity and access issues independently",
+"Architected a dedicated security testing environment hosted on private Proxmox infrastructure, maintaining uninterrupted access to security tools and practice labs."
 ]
 date = "2026 - Present"
 
 [[projects]]
-name = "HTB SOC Analyst Path"
-tags = ["Splunk", "Elastic", "Sysmon", "Windows Event Logs", "MITRE ATT&CK"]
-bullets =[
-"• Completing structured SOC analyst training across 15 modules covering log analysis, SIEM, and threat detection.",
-"• Analyzed Windows and Linux logs to triage alerts, distinguish true positives, and make escalation decisions.",
-"• Practiced detection of process injection (T1055) and mapped attacker behavior to MITRE ATT&CK framework.",
-"• Worked through scenarios involving Active Directory, PAW, and Tier-0 asset monitoring in simulated environments.",
+name = "Go-vulns Security Scanner"
+tags = ["Go", "HTTP", "CORS"]
+bullets = [
+"Developed an AppSec scanner in Go using a worker-pool model to audit web targets concurrently for broken CORS access controls and missing HTTP security headers.",
+"Handled low-level network I/O and TLS/HTTP handshakes using Go's net/http engine, enforcing strict context timeouts per socket connection to ensure system resilience under network latency.",
+"Delivered a production-ready CLI & Dockerized security tool designed for automated web application security testing and containerized vulnerability management."
 ]
-date = "2026 - Present"
+date = "2026"
 
 [[projects]]
 name = "Multithreaded HTTP Server in Rust"
 tags = ["Rust", "TCP", "Systems Programming"]
 bullets = [
-"• Implemented a TCP-level HTTP/1.1 server from scratch in Rust, handling concurrent requests via a thread pool.",
-"• Applied Rust’s memory safety model to eliminate data races in concurrent connection handling.",
+"Implemented a TCP-level HTTP/1.1 server from scratch in Rust, handling concurrent requests via a thread pool.",
+"Applied Rust’s memory safety model to eliminate data races in concurrent connection handling.",
 ]
 date = "2026"
 
@@ -56,9 +55,9 @@ name = "CTF Cybersecurity Week – Borregitos.exe"
 team_name = "Borregitos.exe"
 date = "October 2025"
 bullets = [
-"• Achieved 4th national place in a capture-the-flag cybersecurity competition.",
-"• Conducted OSINT reconnaissance and developed a macrovirus to exploit a vulnerability in the target machine.",
-"• Applied nmap for port scanning and network enumeration during offensive security challenges."
+"Achieved 4th national place in a capture-the-flag cybersecurity competition.",
+"Conducted OSINT reconnaissance and developed a macrovirus to exploit a vulnerability in the target machine.",
+"Applied nmap for port scanning and network enumeration during offensive security challenges."
 ]
 
 [[competitions]]
@@ -67,9 +66,16 @@ team_name = "PaySafe"
 date = "October 2025"
 tags = ["React", "Supabase", "SQL", "Gemini API", "ESP32"]
 bullets = [
-"• Built a real-time driver monitoring system integrating ESP32 IoT sensors with a cloud database via Supabase.",
-"• Architected SQL schema for real-time IoT-to-cloud data ingestion and surfaced insights via a Gemini API chatbot."
+"Built a real-time driver monitoring system integrating ESP32 IoT sensors with a cloud database via Supabase.",
+"Architected SQL schema for real-time IoT-to-cloud data ingestion and surfaced insights via a Gemini API chatbot."
 ]
+
+[[competitions]]
+name = "ICPC competitor"
+team_name = "TripleT"
+tag = "Tecnologico de Monterrey"
+bullets = ["Competing in ICPC as part of Tec de Monterrey, developing algorithmic problem-solving under pressure."]
+date = "2026 - present"
 
 [[certifications]]
 name = "CompTIA Security+"
@@ -80,9 +86,3 @@ issuer = "CompTIA"
 name = "Google Cybersecurity Professional Certificate"
 date = "Jan 2026"
 issuer = "Google"
-
-[[activities]]
-name = "ICPC competitor"
-tag = "Tecnologico de Monterrey"
-bullets = ["• Competing in ICPC as part of Tec de Monterrey, developing algorithmic problem-solving under pressure."]
-date = "2026 - present"

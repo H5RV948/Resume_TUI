@@ -46,12 +46,14 @@ pub struct Education {
     pub relevant_courses: Option<Vec<String>>, 
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default, PartialEq, Eq)]
 pub struct Skills {
     pub tools: Vec<String>,
     pub systems: Vec<String>,
     pub languages: Vec<String>,
     pub spoken: Vec<String>,
+    pub networking: Option<Vec<String>>,
+    pub security: Option<Vec<String>>,
 }
 
 #[derive(Deserialize)]
